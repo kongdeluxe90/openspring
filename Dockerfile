@@ -1,6 +1,8 @@
 FROM openjdk:8-jdk-alpine
-RUN addgroup -S spring && adduser -S spring -G spring
+RUN addgroup -S spring && adduser -S -G spring spring
+RUN apk add curl
 USER spring:spring
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
+EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app.jar"]
