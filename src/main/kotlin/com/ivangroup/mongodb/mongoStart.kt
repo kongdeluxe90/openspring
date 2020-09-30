@@ -6,10 +6,12 @@ import java.util.*
 import java.util.function.Consumer
 import java.util.logging.Level
 import java.util.logging.Logger
+import org.json.JSONObject
+import org.json.JSONArray
 
 object Connection {
     @JvmStatic
-    fun showDBs(): List<Document> {
+    fun showDBs(): JSONObject {
         Logger.getLogger("org.mongodb.driver").level = Level.WARNING
         val mongoConUrl = System.getenv("mongoUrl")
         println(mongoConUrl)
@@ -19,17 +21,25 @@ object Connection {
             connectionString = mongoConUrl
         }
 
-        var returnDocument: Document = Document()
+        //var returnDocument: Document = Document()
+        var returnJson: JSONObject = JSONObject()
         var databases: List<Document> = emptyList()
         try {
             MongoClients.create(connectionString).use { mongoClient ->
                 databases = mongoClient.listDatabases().into(ArrayList())
-                databases.forEach(Consumer { db: Document -> returnDocument = db })
-                databases.forEach(Consumer { db: Document -> println(db.toJson()) })
+                //databases.forEach(Consumer { db: Document -> returnDocument = db })
+                //databases.forEach(Consumer { db: Document -> println(db.toJson()) })
+                databases.forEach(Consumer { db: Document ->
+                    var aDB: JSONObject = JSONObject()
+                    aDB.put("name", db.get("name"))
+                    aDB.put("sizeOnDisk", db.get("sizeOnDisk"))
+                    returnJson.put(db.get("name").toString(), aDB) })
+                println(returnJson)
             }
         }catch(e: Exception){
             println(e)
         }
-        return databases
+        //return databases
+        return returnJson
     }
 }
