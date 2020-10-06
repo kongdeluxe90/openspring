@@ -42,4 +42,25 @@ object Connection {
         //return databases
         return returnJson
     }
+
+    fun postInDBs(insertData: String) {
+        Logger.getLogger("org.mongodb.driver").level = Level.WARNING
+        val mongoConUrl = System.getenv("mongoUrl")
+        println(mongoConUrl)
+        var connectionString = "mongodb://127.0.0.1:27017"
+
+        if(mongoConUrl != null) {
+            connectionString = mongoConUrl
+        }
+
+        try {
+            MongoClients.create(connectionString).use { mongoClient ->
+                mongoClient.getDatabase("ivandb").getCollection("starwars").insertOne(Document.parse(insertData))
+                println(insertData)
+                println(Document.parse(insertData))
+            }
+        }catch(e: Exception){
+                println(e)
+            }
+        }
 }
